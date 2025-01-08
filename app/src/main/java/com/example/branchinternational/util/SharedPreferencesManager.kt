@@ -3,7 +3,7 @@ package com.example.branchinternational.util
 import android.content.SharedPreferences
 import androidx.core.content.edit
 
-class SharedPreferencesManager constructor(private  val sharedPreferences: SharedPreferences){
+class SharedPreferencesManager  constructor(private  val sharedPreferences: SharedPreferences){
     companion object{
         private const val KEY_AUTH_TOKEN = ""
     }

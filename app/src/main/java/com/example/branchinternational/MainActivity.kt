@@ -1,47 +1,72 @@
 package com.example.branchinternational
 
 import android.os.Bundle
+import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.activity.enableEdgeToEdge
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
-import com.example.branchinternational.ui.theme.BranchinternationalTheme
+import androidx.compose.runtime.*
+import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.rememberNavController
+import com.example.branchinternational.ui.login.activity.LoginScreen
+import com.example.branchinternational.ui.login.viewmodel.LoginViewModel
 
+import com.example.branchinternational.ui.theme.BranchinternationalTheme
+import com.example.branchinternational.util.SharedPreferencesManager
+import dagger.hilt.android.AndroidEntryPoint
+import javax.inject.Inject
+
+@AndroidEntryPoint
 class MainActivity : ComponentActivity() {
+
+    @Inject
+    lateinit var sharedPreferencesManager: SharedPreferencesManager
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        enableEdgeToEdge()
+
         setContent {
             BranchinternationalTheme {
-                Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-                    Greeting(
-                        name = "Android",
-                        modifier = Modifier.padding(innerPadding)
-                    )
+                val navController = rememberNavController()
+                val loginViewModel: LoginViewModel = viewModel()
+
+                val loginState by loginViewModel.loginState.collectAsState()
+                val toastMessage by loginViewModel.toastMessage.collectAsState()
+
+                LaunchedEffect(toastMessage) {
+                    toastMessage?.let {
+                        Toast.makeText(applicationContext, it, Toast.LENGTH_SHORT).show()
+                    }
+                }
+
+                val savedToken = sharedPreferencesManager.getAuthToken()
+
+                NavHost(
+                    navController = navController,
+                    startDestination = if (savedToken != null) "threads" else "login"
+                ) {
+                    composable("login") {
+                        LoginScreen(
+                            loginState = loginState,
+                            onLoginClick = { username, password ->
+                                loginViewModel.login(username, password)
+                            }
+                        )
+
+                        LaunchedEffect(loginState) {
+                            loginState?.let { result ->
+                                if (result.isSuccess) {
+                                    navController.navigate("threads") {
+                                        popUpTo("login") { inclusive = true }
+                                    }
+                                }
+                            }
+                        }
+                    }
+
                 }
             }
         }
-    }
-}
-
-@Composable
-fun Greeting(name: String, modifier: Modifier = Modifier) {
-    Text(
-        text = "Hello $name!",
-        modifier = modifier
-    )
-}
-
-@Preview(showBackground = true)
-@Composable
-fun GreetingPreview() {
-    BranchinternationalTheme {
-        Greeting("Android")
     }
 }

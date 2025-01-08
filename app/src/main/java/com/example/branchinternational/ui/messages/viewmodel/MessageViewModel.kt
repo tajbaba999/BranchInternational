@@ -18,7 +18,7 @@ import javax.inject.Inject
 class MessageViewModel @Inject constructor(
     private val apiService: ApiService,
     private val sharedPreferences: SharedPreferences,
-    @ApplicationContext private val context: Context // Inject Application Context
+    @ApplicationContext private val context: Context
 ) : ViewModel() {
 
     private val _threadsState = MutableStateFlow<List<Message>>(emptyList())

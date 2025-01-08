@@ -18,21 +18,21 @@ class LoginViewModel @Inject constructor(
     private val sharedPreferences: SharedPreferences
 ) : ViewModel() {
 
-    private val _loginResult = MutableStateFlow<Result<LoginResponse>?>(null)
-    val loginResult: StateFlow<Result<LoginResponse>?> = _loginResult.asStateFlow()
+    private val _loginState = MutableStateFlow<Result<LoginResponse>?>(null)
+    val loginState: StateFlow<Result<LoginResponse>?> = _loginState
 
     private val _toastMessage = MutableStateFlow<String?>(null)
-    val toastMessage: StateFlow<String?> = _toastMessage.asStateFlow()
+    val toastMessage: StateFlow<String?> = _toastMessage
 
     fun login(username: String, password: String) {
         viewModelScope.launch {
             try {
-                val response = loginUseCase(username, password)
+                val result = loginUseCase(username, password)
 
-                response.getOrNull()?.let {
-                    if (it.authToken.isNotEmpty()) {
-                        sharedPreferences.edit().putString("authToken", it.authToken).apply()
-                        _loginResult.value = Result.success(it)
+                result.getOrNull()?.let { loginResponse ->
+                    if (loginResponse.authToken.isNotEmpty()) {
+                        sharedPreferences.edit().putString("authToken", loginResponse.authToken).apply()
+                        _loginState.value = Result.success(loginResponse)
                     } else {
                         _toastMessage.value = "Login Failed: Token is null"
                     }
@@ -40,7 +40,7 @@ class LoginViewModel @Inject constructor(
                     _toastMessage.value = "Login Failed: Unknown error"
                 }
             } catch (e: Exception) {
-                _loginResult.value = Result.failure(e)
+                _loginState.value = Result.failure(e)
 
                 if (e.message?.contains("401") == true || e.message?.contains("invalid") == true) {
                     _toastMessage.value = "Login Failed: Username or password is invalid"
