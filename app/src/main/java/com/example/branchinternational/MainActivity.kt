@@ -1,72 +1,100 @@
-package com.example.branchinternational
+package com.example.branchinternational.ui
 
+import android.content.Context
+import android.content.SharedPreferences
 import android.os.Bundle
-import android.util.Log
 import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.compose.runtime.*
-import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.activity.viewModels
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.example.branchinternational.ui.theme.BranchinternationalTheme
 import com.example.branchinternational.ui.login.activity.LoginScreen
 import com.example.branchinternational.ui.login.viewmodel.LoginViewModel
-
-import com.example.branchinternational.ui.theme.BranchinternationalTheme
-import com.example.branchinternational.util.SharedPreferencesManager
+import com.example.branchinternational.ui.messages.composable.MessageThreadsScreen
+import com.example.branchinternational.ui.messages.composable.ThreadDetailsScreen
+import com.example.branchinternational.ui.messages.viewmodel.MessageViewModel
 import dagger.hilt.android.AndroidEntryPoint
-import javax.inject.Inject
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
 
-    @Inject
-    lateinit var sharedPreferencesManager: SharedPreferencesManager
+    // Use Hilt ViewModel delegation for both LoginViewModel and MessageViewModel
+    private val loginViewModel: LoginViewModel by viewModels()
+    private val messageViewModel: MessageViewModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
+        val sharedPreferences: SharedPreferences =
+            getSharedPreferences("UserPrefs", Context.MODE_PRIVATE)
+        val savedToken = sharedPreferences.getString("authToken", null)
+
         setContent {
             BranchinternationalTheme {
                 val navController = rememberNavController()
-                val loginViewModel: LoginViewModel = viewModel()
 
-                val loginState by loginViewModel.loginState.collectAsState()
-                val toastMessage by loginViewModel.toastMessage.collectAsState()
+                val loginState = loginViewModel.loginState.collectAsState().value
+                val toastMessage = loginViewModel.toastMessage.collectAsState()
 
-                LaunchedEffect(toastMessage) {
-                    toastMessage?.let {
-                        Toast.makeText(applicationContext, it, Toast.LENGTH_SHORT).show()
-                    }
+                toastMessage.value?.let {
+                    Toast.makeText(applicationContext, it, Toast.LENGTH_SHORT).show()
                 }
 
-                val savedToken = sharedPreferencesManager.getAuthToken()
-                Log.d("MainActivity", "Saved Token: $savedToken")
+                savedToken?.let { token ->
+                    LaunchedEffect(token) {
+                        messageViewModel.fetchThreads(token)
+                    }
+                }
 
                 NavHost(
                     navController = navController,
                     startDestination = if (savedToken != null) "threads" else "login"
                 ) {
+                    // Login Screen
                     composable("login") {
                         LoginScreen(
-                            loginState = loginState,
+                            loginState = loginState, // Access the value of the State here
                             onLoginClick = { username, password ->
                                 loginViewModel.login(username, password)
-                            }
-                        )
-
-                        LaunchedEffect(loginState) {
-                            loginState?.let { result ->
-                                if (result.isSuccess) {
-                                    navController.navigate("threads") {
-                                        popUpTo("login") { inclusive = true }
+                                loginState?.let { result ->
+                                    if (result.isSuccess) {
+                                        navController.navigate("threads") {
+                                            popUpTo("login") { inclusive = true }
+                                        }
                                     }
                                 }
                             }
-                        }
+                        )
                     }
 
+                    // Threads Screen
+                    composable("threads") {
+                        LaunchedEffect(Unit) {
+                            savedToken?.let { token ->
+                                messageViewModel.fetchThreads(token)
+                            }
+                        }
+                        MessageThreadsScreen(
+                            navController = navController,
+                            viewModel = messageViewModel
+                        )
+                    }
+
+                    // Thread Details Screen
+                    composable("threadDetails/{threadId}") { backStackEntry ->
+                        val threadId = backStackEntry.arguments?.getString("threadId")?.toInt()
+                            ?: return@composable
+                        ThreadDetailsScreen(
+                            navController = navController,
+                            threadId = threadId,
+                            viewModel = messageViewModel
+                        )
+                    }
                 }
             }
         }

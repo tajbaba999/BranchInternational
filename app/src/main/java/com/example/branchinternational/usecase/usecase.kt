@@ -1,5 +1,6 @@
 package com.example.branchinternational.usecase
 
+import android.util.Log
 import com.example.branchinternational.data.model.LoginRequest
 import com.example.branchinternational.data.model.LoginResponse
 import com.example.branchinternational.data.model.Message
@@ -10,9 +11,13 @@ import javax.inject.Inject
 
 class LoginUseCase @Inject constructor(private val loginRepository: LoginRepository) {
     suspend operator fun invoke(username: String, password: String): Result<LoginResponse> {
+        Log.d("userdetails", "username: ${username} pass: ${password}")
         if (username.isBlank() || password.isBlank()) {
+            Log.d("userdetails", "Hii")
             return Result.failure(IllegalArgumentException("Username and password cannot be empty"))
         }
+
+
         return loginRepository.login(LoginRequest(username, password))
     }
 }

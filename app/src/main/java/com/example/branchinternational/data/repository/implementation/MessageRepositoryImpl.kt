@@ -1,23 +1,20 @@
-package com.example.branchinternational.data.repository.implementation
+package com.example.branchinternational.data.util
 
-import com.example.branchinternational.data.model.Message
-import com.example.branchinternational.data.repository.interfaces.MessageRepository
-import com.example.branchinternational.data.source.remote.ApiService
-import com.example.branchinternational.util.SharedPreferencesManager
-import javax.inject.Inject
+import android.content.SharedPreferences
 
-class MessageRepositoryImpl @Inject constructor(private val apiService: ApiService, private val sharedPreferencesManager: SharedPreferencesManager) : MessageRepository{
-    private fun getAuthToken() : String?{
-        return sharedPreferencesManager.getAuthToken()
+class SharedPreferencesManager(private val sharedPreferences: SharedPreferences) {
+
+    companion object {
+        const val AUTH_TOKEN_KEY = "authToken"
     }
 
-    override suspend fun getMessages(): Result<List<Message>> {
-       return try {
-           val token = getAuthToken() ?: return Result.failure(Exception("No auth token"))
-           Result.success(apiService.getMesssages(token))
-       }catch (e : Exception){
-           Result.failure(e)
-       }
+    fun saveAuthToken(authToken: String) {
+        val editor = sharedPreferences.edit()
+        editor.putString(AUTH_TOKEN_KEY, authToken)
+        editor.apply() // or editor.commit() for synchronous
     }
 
+    fun getAuthToken(): String? {
+        return sharedPreferences.getString(AUTH_TOKEN_KEY, null)
+    }
 }

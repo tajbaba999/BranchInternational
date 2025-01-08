@@ -1,11 +1,11 @@
 package com.example.branchinternational.data.model
 
 
+import com.google.gson.annotations.SerializedName
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 @Serializable
 data class LoginResponse(
-    @SerialName("auth_token")
-    val authToken: String?
+    @SerializedName("auth_token") val authToken: String
 )

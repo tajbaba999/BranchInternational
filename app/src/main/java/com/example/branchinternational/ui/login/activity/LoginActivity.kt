@@ -25,9 +25,14 @@ class LoginActivity : ComponentActivity() {
         setContent {
             val loginState = viewModel.loginState.collectAsState().value
 
-            LoginScreen(onLoginClick = { username, password ->
-                viewModel.login(username, password)
-            }, loginState = loginState)
+
+            LoginScreen(
+                onLoginClick = { username, password ->
+                    viewModel.login(username, password)
+                },
+                loginState = loginState
+            )
+
 
             if (sharedPreferences.getString("authToken", null) != null) {
                 val token = sharedPreferences.getString("authToken", null)

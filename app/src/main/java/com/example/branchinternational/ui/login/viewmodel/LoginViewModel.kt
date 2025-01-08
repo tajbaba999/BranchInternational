@@ -35,6 +35,7 @@ class LoginViewModel @Inject constructor(
         viewModelScope.launch {
             try {
                 val result = loginUseCase(username, password)
+                Log.d("result", "Auth token : ${result}")
                 Log.d("userdetails", "username: ${username} pass: ${password}")
                 result.getOrNull()?.let { loginResponse ->
                     val authToken = loginResponse.authToken

@@ -42,7 +42,7 @@ class SendMessageRepositoryImpl @Inject constructor(
     private val sharedPreferencesManager: SharedPreferencesManager
 ) : SendMessageRepository {
 
-    private fun getAuthToken(): String? = sharedPreferencesManager.getAuthToken() // Private function
+    private fun getAuthToken(): String? = sharedPreferencesManager.getAuthToken()
 
     override suspend fun sendMessage(message: Message): Result<Message> {
         return withContext(Dispatchers.IO) {
