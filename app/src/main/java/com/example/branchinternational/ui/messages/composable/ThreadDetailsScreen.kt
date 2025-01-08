@@ -1,3 +1,4 @@
+// ThreadDetailScreen.kt
 package com.example.branchinternational.ui.messages.composable
 
 import android.content.Context
@@ -19,8 +20,8 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.example.branchinternational.data.model.Message
+import com.example.branchinternational.ui.components.MessageItem
 import com.example.branchinternational.ui.messages.viewmodel.MessageViewModel
-
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -50,7 +51,6 @@ fun ThreadDetailsScreen(
                 .fillMaxSize()
                 .padding(paddingValues)
         ) {
-
             LazyColumn(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -62,7 +62,6 @@ fun ThreadDetailsScreen(
                     MessageItem(message)
                 }
             }
-
 
             Row(
                 modifier = Modifier
@@ -87,11 +86,7 @@ fun ThreadDetailsScreen(
                         .weight(1f)
                         .background(MaterialTheme.colorScheme.surface, RoundedCornerShape(8.dp))
                         .padding(12.dp),
-                    label = { Text("Type a message") },
-                    colors = TextFieldDefaults.colors(
-//                        focusedContainerColor = Color(0xFF1F4529),
-//                        unfocusedContainerColor = Color(0xFF47663B)
-                    )
+                    label = { Text("Type a message") }
                 )
 
                 Spacer(modifier = Modifier.width(8.dp))
@@ -117,33 +112,5 @@ fun sendMessage(threadId: Int, messageBody: String, context: Context, viewModel:
         Toast.makeText(context, "Message Sent", Toast.LENGTH_SHORT).show()
     } else {
         Toast.makeText(context, "Message cannot be empty", Toast.LENGTH_SHORT).show()
-    }
-}
-
-@Composable
-fun MessageItem(message: Message) {
-    Row(
-        modifier = Modifier.fillMaxWidth(),
-        horizontalArrangement = if (message.agent_id != null) {
-            Arrangement.End
-        } else {
-            Arrangement.Start
-        }
-    ) {
-        Card(
-            shape = RoundedCornerShape(8.dp),
-            elevation = CardDefaults.elevatedCardElevation(defaultElevation = 4.dp),
-            modifier = Modifier
-                .fillMaxWidth(0.8f)
-                .padding(8.dp)
-        ) {
-            Column(modifier = Modifier.padding(16.dp)) {
-                Text("Sender: ${message.user_id ?: "Agent"}", style = MaterialTheme.typography.bodyMedium)
-                Spacer(modifier = Modifier.height(4.dp))
-                Text("Message: ${message.body}", style = MaterialTheme.typography.bodyLarge)
-                Spacer(modifier = Modifier.height(4.dp))
-                Text("Sent at: ${message.timestamp}", style = MaterialTheme.typography.bodySmall)
-            }
-        }
     }
 }

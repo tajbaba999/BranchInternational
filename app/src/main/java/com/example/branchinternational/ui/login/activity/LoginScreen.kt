@@ -17,7 +17,7 @@ import com.example.branchinternational.ui.components.*
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun LoginScreen(
-    loginState: State<Result<LoginResponse>?>,
+    loginState: Result<LoginResponse>?,
     onLoginClick: (String, String) -> Unit
 ) {
     val backgroundColor = MaterialTheme.colorScheme.surface
@@ -67,13 +67,16 @@ fun LoginScreen(
             modifier = Modifier.fillMaxWidth()
         )
 
-        loginState.value?.let { result ->
-            if (result.isFailure
-                ) {
+        loginState?.let { result ->
+            if (result.isFailure) {
                 Spacer(modifier = Modifier.height(16.dp))
                 ErrorMessage(
                     message = "Login failed: ${result.exceptionOrNull()?.message ?: "Unknown error"}",
                 )
+            } else if (result.isSuccess) {
+                // Handle successful login here
+                Spacer(modifier = Modifier.height(16.dp))
+                Text("Login successful!")
             }
         }
     }

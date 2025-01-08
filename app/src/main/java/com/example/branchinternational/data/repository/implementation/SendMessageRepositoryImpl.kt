@@ -7,6 +7,7 @@ import com.example.branchinternational.util.SharedPreferencesManager
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.io.IOException
+import javax.inject.Inject
 
 //class SharedMessageRepositoryImpl constructor(private val apiService: ApiService, private val sharedPreferencesManager: SharedPreferencesManager) : SendMessageRepository {
 ////    override suspend fun sendMessage(message: Message): Result<Message>
@@ -36,7 +37,7 @@ import java.io.IOException
 //
 //}
 
-class SendMessageRepositoryImpl constructor(
+class SendMessageRepositoryImpl @Inject constructor(
     private val apiService: ApiService,
     private val sharedPreferencesManager: SharedPreferencesManager
 ) : SendMessageRepository {

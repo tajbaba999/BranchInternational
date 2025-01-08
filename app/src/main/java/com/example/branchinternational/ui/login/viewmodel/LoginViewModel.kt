@@ -35,8 +35,10 @@ class LoginViewModel @Inject constructor(
         viewModelScope.launch {
             try {
                 val result = loginUseCase(username, password)
+                Log.d("userdetails", "username: ${username} pass: ${password}")
                 result.getOrNull()?.let { loginResponse ->
                     val authToken = loginResponse.authToken
+                    Log.d("auth", "Auth token : ${authToken}")
                     if (authToken.isNullOrEmpty()) {
                         _toastMessage.value = "Login Failed: Token is null or empty"
                     } else {

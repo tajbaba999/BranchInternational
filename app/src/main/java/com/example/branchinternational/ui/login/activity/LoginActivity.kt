@@ -23,7 +23,7 @@ class LoginActivity : ComponentActivity() {
         val sharedPreferences = getSharedPreferences("UserPrefs", Context.MODE_PRIVATE)
 
         setContent {
-            val loginState = viewModel.loginState.collectAsState()
+            val loginState = viewModel.loginState.collectAsState().value
 
             LoginScreen(onLoginClick = { username, password ->
                 viewModel.login(username, password)
