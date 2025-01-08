@@ -1,5 +1,6 @@
 package com.example.branchinternational.data.repository.implementation
 
+import android.util.Log
 import com.example.branchinternational.data.model.LoginRequest
 import com.example.branchinternational.data.model.LoginResponse
 import com.example.branchinternational.data.repository.interfaces.LoginRepository
@@ -14,10 +15,17 @@ class LoginRepositoryImpl @Inject constructor(
 ) : LoginRepository {
     override suspend fun login(request: LoginRequest): Result<LoginResponse> {
         return try {
+            Log.d("cred"," username : ${request.username}  paswrod : ${request.password}")
             val response = apiService.login(request)
-            sharedPreferencesManager.saveAuthToken(response.authToken)
-            Result.success(response)
+            Log.d("LoginRepository", "Raw JSON Response: ${response.authToken}")
+            if (response.authToken.isNullOrEmpty()) {
+                Log.e("LoginRepository", "Error: authToken is null or empty")
+              return  Result.failure(Exception("Auth token is missing"))
+            }
+                sharedPreferencesManager.saveAuthToken(response.authToken)
+                Result.success(response)
         } catch (e: Exception) {
+            Log.e("LoginRepository", "Login failed", e) // Log the full exception
             Result.failure(e)
         }
     }

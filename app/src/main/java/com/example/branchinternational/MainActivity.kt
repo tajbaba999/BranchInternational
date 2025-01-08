@@ -1,6 +1,7 @@
 package com.example.branchinternational
 
 import android.os.Bundle
+import android.util.Log
 import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -41,6 +42,7 @@ class MainActivity : ComponentActivity() {
                 }
 
                 val savedToken = sharedPreferencesManager.getAuthToken()
+                Log.d("MainActivity", "Saved Token: $savedToken")
 
                 NavHost(
                     navController = navController,

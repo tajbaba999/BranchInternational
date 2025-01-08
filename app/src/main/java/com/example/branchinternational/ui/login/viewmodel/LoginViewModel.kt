@@ -1,6 +1,7 @@
 package com.example.branchinternational.ui.login.viewmodel
 
 import android.content.SharedPreferences
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.branchinternational.data.model.LoginResponse
@@ -11,6 +12,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
+
 
 @HiltViewModel
 class LoginViewModel @Inject constructor(
@@ -25,29 +27,31 @@ class LoginViewModel @Inject constructor(
     val toastMessage: StateFlow<String?> = _toastMessage
 
     fun login(username: String, password: String) {
+        if (username.isBlank() || password.isBlank()) {
+            _toastMessage.value = "Username and password cannot be empty"
+            return
+        }
+
         viewModelScope.launch {
             try {
                 val result = loginUseCase(username, password)
-
                 result.getOrNull()?.let { loginResponse ->
-                    if (loginResponse.authToken.isNotEmpty()) {
-                        sharedPreferences.edit().putString("authToken", loginResponse.authToken).apply()
-                        _loginState.value = Result.success(loginResponse)
+                    val authToken = loginResponse.authToken
+                    if (authToken.isNullOrEmpty()) {
+                        _toastMessage.value = "Login Failed: Token is null or empty"
                     } else {
-                        _toastMessage.value = "Login Failed: Token is null"
+                        sharedPreferences.edit().putString("authToken", authToken).apply()
+                        _loginState.value = Result.success(loginResponse)
                     }
                 } ?: run {
                     _toastMessage.value = "Login Failed: Unknown error"
                 }
             } catch (e: Exception) {
                 _loginState.value = Result.failure(e)
-
-                if (e.message?.contains("401") == true || e.message?.contains("invalid") == true) {
-                    _toastMessage.value = "Login Failed: Username or password is invalid"
-                } else {
-                    _toastMessage.value = "Login Failed: ${e.message}"
-                }
+                Log.e("LoginViewModel", "Login failed: ${e.message}", e)
+                _toastMessage.value = "Login Failed: ${e.message ?: "Unknown error"}"
             }
         }
     }
 }
+

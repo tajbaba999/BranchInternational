@@ -99,5 +99,14 @@ dependencies {
     implementation ("androidx.compose.runtime:runtime:1.5.1")
     implementation ("androidx.compose.material:material:1.5.1")
 
+    //Serilaizable
+
+    dependencies {
+        implementation ("org.jetbrains.kotlinx:kotlinx-serialization-json:1.5.1")
+    }
+
+    implementation ("com.squareup.okhttp3:logging-interceptor:4.9.3")
+
+
 }
 
