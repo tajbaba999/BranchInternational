@@ -3,5 +3,5 @@ package com.example.branchinternational.data.repository.interfaces
 import com.example.branchinternational.data.model.Message
 
 interface MessageRepository {
-    suspend fun getMessage(): Result<List<Message>>
+    suspend fun getMessages(): Result<List<Message>>
 }
