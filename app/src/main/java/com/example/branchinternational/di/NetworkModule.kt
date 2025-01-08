@@ -1,11 +1,11 @@
 package com.example.branchinternational.di
 
 import com.example.branchinternational.data.source.remote.ApiService
+import com.example.branchinternational.di.Constants.BASE_URL
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 
 object NetworkModule {
-    private const val BASE_URL = ""
 
     private val retrofit : Retrofit by lazy {
         Retrofit.Builder()
