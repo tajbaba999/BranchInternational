@@ -8,12 +8,14 @@ import androidx.activity.viewModels
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Modifier
 import com.example.branchinternational.ui.login.viewmodel.LoginViewModel
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
 class LoginActivity : ComponentActivity() {
+    private val viewModel : LoginViewModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -21,11 +23,17 @@ class LoginActivity : ComponentActivity() {
         val sharedPreferences = getSharedPreferences("UserPrefs", Context.MODE_PRIVATE)
 
         setContent {
-            val authToken = sharedPreferences.getString("authToken", null)
+            val loginState = viewModel.loginState.collectAsState()
 
-            if (authToken != null) {
-                DashboardScreen(token = authToken)
-            } else {
+            LoginScreen(onLoginClick = { username, password ->
+                viewModel.login(username, password)
+            }, loginState = loginState)
+
+            if (sharedPreferences.getString("authToken", null) != null) {
+                val token = sharedPreferences.getString("authToken", null)
+                if (token != null) {
+                    DashboardScreen(token = token)
+                }
             }
         }
     }

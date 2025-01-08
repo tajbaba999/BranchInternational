@@ -32,46 +32,30 @@ class MessageViewModel @Inject constructor(
 
     private val _sendMessageResult = MutableStateFlow<Result<Message>?>(null)
     val sendMessageResult: StateFlow<Result<Message>?> = _sendMessageResult.asStateFlow()
-
-    private fun getAuthToken(): String? {
-        return sharedPreferences.getString("authToken", null)
-    }
-
-    fun fetchThreads() {
+    fun fetchThreads(authToken: String) {
         viewModelScope.launch {
             _isLoading.value = true
-            val authToken = getAuthToken()
-            if (authToken != null) { // Check if token is not null before making the call
-                try {
-                    val messages = apiService.getMesssages(authToken)
-                    val groupedThreads = messages.groupBy { it.thread_id }
-                        .map { (_, threadMessages) ->
-                            threadMessages.maxByOrNull { it.timestamp }!!
-                        }
-                    _threadsState.value = groupedThreads
-                } catch (e: Exception) {
-                    e.printStackTrace()
-
-                } finally {
-                    _isLoading.value = false
-                }
-            } else {
-
+            try {
+                val messages = apiService.getMesssages(authToken)
+                val groupedThreads = messages.groupBy { it.thread_id }
+                    .map { (_, threadMessages) ->
+                        threadMessages.maxByOrNull { it.timestamp }!!
+                    }
+                _threadsState.value = groupedThreads
+            } catch (e: Exception) {
+                e.printStackTrace()
+            } finally {
                 _isLoading.value = false
             }
         }
     }
-
-    fun fetchMessages() {
+    fun fetchMessages(authToken: String) {
         viewModelScope.launch {
-            val authToken = getAuthToken()
-            if (authToken != null) {
-                try {
-                    val messages = apiService.getMesssages(authToken)
-                    _messagesState.value = messages
-                } catch (e: Exception) {
-                    e.printStackTrace()
-                }
+            try {
+                val messages = apiService.getMesssages(authToken)
+                _messagesState.value = messages
+            } catch (e: Exception) {
+                e.printStackTrace()
             }
         }
     }
@@ -79,31 +63,25 @@ class MessageViewModel @Inject constructor(
 
     fun sendMessage(threadId: Int, messageBody: String) {
         viewModelScope.launch {
-            val authToken = getAuthToken()
-            if (authToken != null) {
-                val newMessage = Message(
-                    id = 0,
-                    thread_id = threadId,
-                    user_id = "user", // Consider getting the user ID dynamically
-                    body = messageBody,
-                    timestamp = System.currentTimeMillis().toString(),
-                    agent_id = null
-                )
+            val authToken = sharedPreferences.getString("authToken", null) ?: return@launch
 
-                try {
-                    val response = apiService.sendMessage(authToken, newMessage)
-                    if (response.isSuccessful) {
-                        fetchThreads()
-                        fetchMessages()
-                        _sendMessageResult.value = Result.success(newMessage)
-                    } else {
-                        _sendMessageResult.value = Result.failure(Throwable("Failed to send message"))
-                    }
-                } catch (e: Exception) {
-                    e.printStackTrace()
-                    _sendMessageResult.value = Result.failure(e)
-                }
+            val newMessage = Message(
+                id = 0,
+                thread_id = threadId,
+                user_id = "user",
+                body = messageBody,
+                timestamp = System.currentTimeMillis().toString(),
+                agent_id = null
+            )
+
+            try {
+                apiService.sendMessage(authToken, newMessage)
+                fetchThreads(authToken)
+                fetchMessages(authToken)
+            } catch (e: Exception) {
+                e.printStackTrace()
             }
         }
+    }
     }
 }
