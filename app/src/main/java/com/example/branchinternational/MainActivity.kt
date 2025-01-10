@@ -1,14 +1,16 @@
-package com.example.branchinternational.ui
+package com.example.branchinternational
 
 import android.content.Context
 import android.content.SharedPreferences
 import android.os.Bundle
+import android.util.Log
 import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
+import androidx.navigation.NavController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
@@ -23,7 +25,6 @@ import dagger.hilt.android.AndroidEntryPoint
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
 
-    // Use Hilt ViewModel delegation for both LoginViewModel and MessageViewModel
     private val loginViewModel: LoginViewModel by viewModels()
     private val messageViewModel: MessageViewModel by viewModels()
 
@@ -37,7 +38,6 @@ class MainActivity : ComponentActivity() {
         setContent {
             BranchinternationalTheme {
                 val navController = rememberNavController()
-
                 val loginState = loginViewModel.loginState.collectAsState().value
                 val toastMessage = loginViewModel.toastMessage.collectAsState()
 
@@ -45,12 +45,7 @@ class MainActivity : ComponentActivity() {
                     Toast.makeText(applicationContext, it, Toast.LENGTH_SHORT).show()
                 }
 
-                savedToken?.let { token ->
-                    LaunchedEffect(token) {
-                        messageViewModel.fetchThreads(token)
-                    }
-                }
-
+                // Navigation Host
                 NavHost(
                     navController = navController,
                     startDestination = if (savedToken != null) "threads" else "login"
@@ -58,23 +53,32 @@ class MainActivity : ComponentActivity() {
                     // Login Screen
                     composable("login") {
                         LoginScreen(
-                            loginState = loginState, // Access the value of the State here
+                            loginState = loginState,
                             onLoginClick = { username, password ->
                                 loginViewModel.login(username, password)
-                                loginState?.let { result ->
-                                    if (result.isSuccess) {
-                                        navController.navigate("threads") {
-                                            popUpTo("login") { inclusive = true }
-                                        }
-                                    }
-                                }
                             }
                         )
+
+                        // Navigate to threads on successful login
+                        LaunchedEffect(loginState) {
+                           loginState?.getOrNull()?.let {loginResponse ->
+                               val token = loginResponse.authToken
+                               sharedPreferences.edit().putString("authToken", token).apply()
+                               navController.navigate("threads"){
+                                   popUpTo("login") { inclusive = true }
+                               }
+                           } ?: run{
+                               if (loginState?.isFailure == true){
+                                   val errorMessage = loginState?.exceptionOrNull()?.message  ?: "Unknow error"
+                                   Log.e("LoginError", errorMessage)
+                               }
+                        }
+                        }
                     }
 
                     // Threads Screen
                     composable("threads") {
-                        LaunchedEffect(Unit) {
+                        LaunchedEffect(savedToken) {
                             savedToken?.let { token ->
                                 messageViewModel.fetchThreads(token)
                             }
