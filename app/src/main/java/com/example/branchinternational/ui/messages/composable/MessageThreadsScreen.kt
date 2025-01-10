@@ -1,5 +1,7 @@
 package com.example.branchinternational.ui.messages.composable
 import android.content.Context
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
@@ -22,6 +24,7 @@ import com.example.branchinternational.data.model.Message
 import com.example.branchinternational.ui.components.ThreadItem
 import com.example.branchinternational.ui.messages.viewmodel.MessageViewModel
 
+@RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun MessageThreadsScreen(navController: NavController, viewModel: MessageViewModel) {
     val isLoading = viewModel.isLoading.collectAsState().value

@@ -35,11 +35,11 @@ class LoginViewModel @Inject constructor(
         viewModelScope.launch {
             try {
                 val result = loginUseCase(username, password)
-                Log.d("result", "Auth token : ${result}")
-                Log.d("userdetails", "username: ${username} pass: ${password}")
+//                Log.d("result", "Auth token : ${result}")
+//                Log.d("userdetails", "username: ${username} pass: ${password}")
                 result.getOrNull()?.let { loginResponse ->
                     val authToken = loginResponse.authToken
-                    Log.d("auth", "Auth token : ${authToken}")
+//                    Log.d("auth", "Auth token : ${authToken}")
                     if (authToken.isNullOrEmpty()) {
                         _toastMessage.value = "Login Failed: Token is null or empty"
                     } else {
@@ -51,7 +51,7 @@ class LoginViewModel @Inject constructor(
                 }
             } catch (e: Exception) {
                 _loginState.value = Result.failure(e)
-                Log.e("LoginViewModel", "Login failed: ${e.message}", e)
+//                Log.e("LoginViewModel", "Login failed: ${e.message}", e)
                 _toastMessage.value = "Login Failed: ${e.message ?: "Unknown error"}"
             }
         }

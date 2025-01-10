@@ -27,11 +27,11 @@ fun CustomTextField(
         onValueChange = onValueChange,
         label = { Text(label) },
         modifier = modifier.padding(vertical = 8.dp),
-        colors = TextFieldDefaults.outlinedTextFieldColors(
-            focusedBorderColor = MaterialTheme.colorScheme.primary,
-            unfocusedBorderColor = MaterialTheme.colorScheme.onSurface,
-            focusedLabelColor = MaterialTheme.colorScheme.primary
-        ),
+//        colors = TextFieldDefaults.outlinedTextFieldColors(
+//            focusedBorderColor = MaterialTheme.colorScheme.primary,
+//            unfocusedBorderColor = MaterialTheme.colorScheme.onSurface,
+//            focusedLabelColor = MaterialTheme.colorScheme.primary
+//        ),
         visualTransformation = if (isPasswordField && !passwordVisible) PasswordVisualTransformation() else VisualTransformation.None,
         trailingIcon = {
             if (isPasswordField) {

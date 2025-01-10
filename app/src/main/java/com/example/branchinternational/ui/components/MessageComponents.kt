@@ -1,7 +1,10 @@
 package com.example.branchinternational.ui.components
 
 import android.content.Context
+import android.os.Build
+import android.util.Log
 import android.widget.Toast
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -15,6 +18,12 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import com.example.branchinternational.data.model.Message
+import java.sql.Timestamp
+import java.time.DateTimeException
+import java.time.Instant
+import java.time.ZoneId
+import java.time.format.DateTimeFormatter
+import java.util.Locale
 
 @Composable
 fun MessageItem(message: Message) {
@@ -44,11 +53,13 @@ fun MessageItem(message: Message) {
     }
 }
 
+@RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun ThreadItem(
     thread: Message,
     onClick: () -> Unit
 ) {
+
     val borderColor = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.5f)
     Card(
         modifier = Modifier
@@ -71,6 +82,8 @@ fun ThreadItem(
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.secondary
             )
+//            Log.d("time", "${thread.timestamp}")
+//            Log.d("times", "${formatIsoTimestamp(thread.timestamp)}")
             Spacer(modifier = Modifier.height(4.dp))
             Text(
                 text = "Sent by: ${thread.user_id} at ${thread.timestamp}",
@@ -86,3 +99,14 @@ fun ThreadItem(
         }
     }
 }
+
+//@RequiresApi(Build.VERSION_CODES.O)
+//fun formatIsoTimestamp(timestamp: String): String {
+//    return try {
+//        val instant = Instant.parse(timestamp) // Parse the ISO 8601 string
+//        val formatter = DateTimeFormatter.ofPattern("dd MMM yyyy, hh:mm a", Locale.getDefault()) // Define desired format
+//        instant.atZone(ZoneId.systemDefault()).format(formatter) // Convert to system's timezone and format
+//    } catch (e: Exception) {
+//        "Invalid date" // Return a fallback string in case of parsing errors
+//    }
+//}

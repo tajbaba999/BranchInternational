@@ -32,8 +32,8 @@ fun PasswordTextField(
             }
         },
         modifier = modifier.padding(vertical = 8.dp),
-        colors = TextFieldDefaults.colors(
-            focusedContainerColor = MaterialTheme.colorScheme.surface
-        )
+//        colors = TextFieldDefaults.colors(
+//            focusedContainerColor = MaterialTheme.colorScheme.surface
+//        )
     )
 }

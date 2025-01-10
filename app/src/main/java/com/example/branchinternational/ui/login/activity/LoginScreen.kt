@@ -1,5 +1,6 @@
 package com.example.branchinternational.ui.login.activity
 
+import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
@@ -7,6 +8,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -21,6 +23,7 @@ fun LoginScreen(
     onLoginClick: (String, String) -> Unit
 ) {
     val backgroundColor = MaterialTheme.colorScheme.surface
+    val context = LocalContext.current
 
     Column(
         modifier = Modifier
@@ -47,7 +50,7 @@ fun LoginScreen(
         CustomTextField(
             value = username,
             onValueChange = { username = it },
-            label = "Username",
+            label = "Email",
             modifier = Modifier.fillMaxWidth()
         )
 
@@ -75,8 +78,9 @@ fun LoginScreen(
                 )
             } else if (result.isSuccess) {
                 // Handle successful login here
-                Spacer(modifier = Modifier.height(16.dp))
-                Text("Login successful!")
+                LaunchedEffect(result) {
+                    Toast.makeText(context, "Login Sucessful!", Toast.LENGTH_SHORT).show()
+                }
             }
         }
     }
