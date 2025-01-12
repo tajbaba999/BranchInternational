@@ -2,8 +2,8 @@ package com.example.branchinternational.di
 
 import com.example.branchinternational.data.repository.implementation.LoginRepositoryImpl
 import com.example.branchinternational.data.repository.interfaces.LoginRepository
+import  com.example.branchinternational.domain.usecase.LoginUseCase
 import com.example.branchinternational.data.source.remote.ApiService
-import com.example.branchinternational.usecase.LoginUseCase
 import com.example.branchinternational.util.SharedPreferencesManager
 import dagger.Module
 import dagger.Provides

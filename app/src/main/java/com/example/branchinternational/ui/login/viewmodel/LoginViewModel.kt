@@ -1,15 +1,13 @@
 package com.example.branchinternational.ui.login.viewmodel
 
 import android.content.SharedPreferences
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.branchinternational.data.model.LoginResponse
-import com.example.branchinternational.usecase.LoginUseCase
+import com.example.branchinternational.domain.usecase.LoginUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
