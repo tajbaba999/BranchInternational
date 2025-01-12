@@ -107,6 +107,10 @@ dependencies {
 
     implementation ("com.squareup.okhttp3:logging-interceptor:4.9.3")
 
-
+    // Room dependencies
+//    implementation("androidx.room:room-runtime:2.6.1")
+//    annotationProcessor("androidx.room:room-compiler:2.6.1")
+    implementation("androidx.room:room-runtime:2.5.2")
+    kapt("androidx.room:room-compiler:2.5.2")
 }
 
